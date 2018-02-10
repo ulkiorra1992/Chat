@@ -27,12 +27,26 @@ TcpChatClient::~TcpChatClient()
 
 void TcpChatClient::setDataUser(const QString &login, const QString &password)
 {
-    qDebug() << "login=" << login << "password=" << password;
+//    qDebug() << "login=" << login << "password=" << password;
 }
 
 void TcpChatClient::connectionClose()
 {
     tcpSocket_.close();
+}
+
+void TcpChatClient::on_aUserRegistration_triggered()
+{
+    UserRegistration *registration = new UserRegistration;
+    if (registration->exec() == QDialog::Accepted) {
+        login_ = registration->userLogin();
+        nickName_ = registration->userNickName();
+        password_ = registration->userPassword();
+
+        onConnectionToServer();
+        type_ = 'R';
+    }
+    delete registration;
 }
 
 void TcpChatClient::on_aUserAuthorization_triggered()
@@ -41,6 +55,7 @@ void TcpChatClient::on_aUserAuthorization_triggered()
     if (autorization->exec() == QDialog::Accepted) {
         login_ = autorization->userLogin();
         password_ = autorization->userPassword();
+
         onConnectionToServer();
         type_ = 'S';
     }
@@ -58,7 +73,7 @@ void TcpChatClient::onSendRequestToServer()
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << quint16(0) << quint8(type_) << login_ << password_;
+    out << quint16(0) << quint8(type_) << login_ << nickName_ << password_;
 
     out.device()->seek(0);
     out << quint16(block.size() - sizeof(quint16));
@@ -116,17 +131,4 @@ void TcpChatClient::onError()
 void TcpChatClient::on_tbQuit_clicked()
 {
     qApp->exit();
-}
-
-
-void TcpChatClient::on_aUserRegistration_triggered()
-{
-    UserRegistration *registration = new UserRegistration;
-    if (registration->exec() == QDialog::Accepted) {
-        login_ = registration->userLogin();
-        nickName_ = registration->userNickName();
-        password_ = registration->userPassword();
-        type_ = 'R';
-    }
-    delete registration;
 }
