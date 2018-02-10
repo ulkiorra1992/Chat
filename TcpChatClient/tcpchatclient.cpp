@@ -57,7 +57,7 @@ void TcpChatClient::on_aUserAuthorization_triggered()
         password_ = autorization->userPassword();
 
         onConnectionToServer();
-        type_ = 'S';
+        type_ = 'A';
     }
     delete autorization;
 }
