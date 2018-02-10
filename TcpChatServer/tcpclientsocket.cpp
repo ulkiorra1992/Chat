@@ -2,6 +2,8 @@
 #include "tcpchatserver.h"
 #include "settings.h"
 
+#include <QDebug>
+
 TcpClientSocket::TcpClientSocket(QObject *parent) :
     QTcpSocket(parent),
     nextBlockSize(0)
@@ -44,19 +46,24 @@ void TcpClientSocket::onReadClient()
 
     in >> requestType >> login >> userName >> password;
 
-    if (requestType == 'S') {
-        sendData(date, time);
+    // Авторизация пользователя
+    if (requestType == 'A') {
 
-        // Сохраняем данные пользователя при подключении его к серверу
+        // проверка данных пользователя при подключении его к серверу
         Settings::getInstance()->setUserAuthorizationLogin(login);
         Settings::getInstance()->setUserAuthorizationPassword(password);
 
+        bool state = TcpChatServer::setAuthorizationUser();
+        if (state) {
+            sendData(date, time);
+        }
+        qDebug() << "fdf";
         QDataStream out(this);
         out << quint16(0xFFFF);
     }
 
+    // Регистрация нового пользователя
     if (requestType == 'R') {
-        sendData(date, time);
 
         // Сохраняем данные пользователя при регистрации его на сервере
         Settings::getInstance()->setUserRegistrationLogin(login);
@@ -65,6 +72,9 @@ void TcpClientSocket::onReadClient()
 
         // если пользователь с таким логином уже зарегистрирован, отправляем ошибку регистрации
         bool state = TcpChatServer::setRegistrationUser();
+        if (state) {
+            sendData(date, time);
+        }
 
         QDataStream out(this);
         out << quint16(0xFFFF);

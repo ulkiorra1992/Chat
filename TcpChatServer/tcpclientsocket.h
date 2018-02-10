@@ -1,6 +1,8 @@
 #ifndef TCPCLIENTSOCKET_H
 #define TCPCLIENTSOCKET_H
 
+#include "tcpchatserver.h"
+
 #include <QTcpSocket>
 #include <QDateTime>
 

@@ -27,7 +27,7 @@ public:
     ~TcpChatServer();
 
     static bool setRegistrationUser();            //!<
-    static void setAuthorizationUser();
+    static bool setAuthorizationUser();
 
 protected:
     /**

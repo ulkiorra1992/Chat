@@ -17,7 +17,6 @@ TcpChatServer::TcpChatServer(QWidget *parent) :
     this->setWindowTitle(APPLICATION_RU_NAME);
 
     server_ = new Server(this);
-//    listItem_ = new QListWidgetItem();
 
 /* Инициализируем иконку трея, устанавливаем иконку своего приложения,
  * а также задаем всплывающую подсказку
@@ -127,10 +126,21 @@ bool TcpChatServer::setRegistrationUser()
 
 }
 
-void TcpChatServer::setAuthorizationUser()
+bool TcpChatServer::setAuthorizationUser()
 {
-//    settings.beginGroup("Authorization");
-//    settings.setValue("Login", Settings::getInstance()->getUserAuthorizationLogin());
-//    settings.setValue("Password", Settings::getInstance()->getUserAuthorizationPassword());
-//    settings.endGroup();
+    QSettings settings(QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/setting.ini"),
+                       QSettings::IniFormat);
+    if (settings.contains("RegistrationLogin/" + Settings::getInstance()->getUserAuthorizationLogin().toString())) {
+        settings.beginGroup("RegistrationPassword");
+        QString regPassword = settings.value(Settings::getInstance()->getUserAuthorizationLogin().toString(),
+                                             Settings::getInstance()->getUserRegistrationPassword().toString()).toString();
+        settings.endGroup();
+        if (Settings::getInstance()->getUserAuthorizationPassword() == regPassword) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
 }
