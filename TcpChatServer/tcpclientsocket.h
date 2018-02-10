@@ -14,10 +14,18 @@ public:
     TcpClientSocket(QObject *parent = 0);
 
 private:
+    /**
+     * @brief sendData Отправка сервером данных
+     * @param date
+     * @param time
+     */
     void sendData(const QDate &date, const QTime &time);
     quint16 nextBlockSize;
 
 private slots:
+    /**
+     * @brief onReadClient чтение данных из потока
+     */
     void onReadClient();
 };
 

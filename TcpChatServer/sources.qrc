@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>img/user.jpg</file>
         <file>img/circle_green.png</file>
+        <file>img/chat.png</file>
     </qresource>
 </RCC>

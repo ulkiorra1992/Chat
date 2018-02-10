@@ -22,6 +22,7 @@ void TcpClientSocket::sendData(const QDate &date, const QTime &time)
 void TcpClientSocket::onReadClient()
 {
     QString login;
+    QString userName;
     QString password;
 
     QDataStream in(this);
@@ -39,11 +40,20 @@ void TcpClientSocket::onReadClient()
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
 
-    in >> requestType >> login >> password;
+    in >> requestType >> login >> userName >> password;
 
     if (requestType == 'S') {
         sendData(date, time);
-        qDebug() << login << password;
+        qDebug() << "avtorization= " << login << password;
+
+        QDataStream out(this);
+        out << quint16(0xFFFF);
+    }
+
+    if (requestType == 'R') {
+        sendData(date, time);
+        qDebug() << "registration= " << login << userName << password;
+
         QDataStream out(this);
         out << quint16(0xFFFF);
     }

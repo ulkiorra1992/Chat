@@ -21,7 +21,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QTableWidget" name="tableWidget">
       <column>
        <property name="text">
@@ -38,6 +38,13 @@
         <string>Статус</string>
        </property>
       </column>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="cbIsTrayIcon">
+      <property name="text">
+       <string>Сворачивать приложение в трей</string>
+      </property>
      </widget>
     </item>
    </layout>
