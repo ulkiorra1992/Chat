@@ -2,8 +2,11 @@
 #include "ui_tcpchatserver.h"
 
 #include "tcpclientsocket.h"
+#include "settings.h"
 
+#include <QTextCodec>
 #include <QDebug>
+#include <QDir>
 
 TcpChatServer::TcpChatServer(QWidget *parent) :
     QMainWindow(parent),
@@ -13,14 +16,15 @@ TcpChatServer::TcpChatServer(QWidget *parent) :
     setWindowIcon(QIcon(":/img/chat.png"));
     this->setWindowTitle(APPLICATION_RU_NAME);
 
-    server_ = new Server();
+    server_ = new Server(this);
+//    listItem_ = new QListWidgetItem();
 
 /* Инициализируем иконку трея, устанавливаем иконку своего приложения,
  * а также задаем всплывающую подсказку
  */
     trayIcon_ = new QSystemTrayIcon(this);
     trayIcon_->setIcon(QIcon(":/img/chat.png"));
-    trayIcon_->setToolTip("Чат");
+    trayIcon_->setToolTip("Сервер");
 //
 
 // ============= Создаем контекстное меню из двух пунктов =================== //
@@ -58,7 +62,7 @@ void TcpChatServer::closeEvent(QCloseEvent *event)
         this->hide();
         QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon(
                     QSystemTrayIcon::Information);
-        trayIcon_->showMessage("Чат",
+        trayIcon_->showMessage("Сервер",
                                "Приложение свернуто в трей. Для того чтобы, "
                                "развернуть окно приложения, щелкните по иконке приложения в трее",
                                icon, 4000);
@@ -93,7 +97,40 @@ void TcpChatServer::onIconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void TcpChatServer::saveSettings()
-{
 
+bool TcpChatServer::setRegistrationUser()
+{
+// ============ Для отображения русских букв в файле Setting.ini ============ //
+    QTextCodec *codecForLocaleName = QTextCodec::codecForName("Windows-1251");
+    QTextCodec::setCodecForLocale(codecForLocaleName);
+//
+
+   QSettings settings(QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/setting.ini"),
+                             QSettings::IniFormat);
+   settings.setIniCodec(codecForLocaleName);
+// Проверка зарегистрирован ли пользователь на сервере
+   if (settings.contains("RegistrationLogin/" + Settings::getInstance()->getUserRegistrationLogin().toString())) {
+        return false;
+   } else {
+       settings.beginGroup("RegistrationLogin");
+       settings.setValue(Settings::getInstance()->getUserRegistrationLogin().toString(),
+                         Settings::getInstance()->getUserRegistrationNickName());
+       settings.endGroup();
+
+       settings.beginGroup("RegistrationPassword");
+       settings.setValue(Settings::getInstance()->getUserRegistrationLogin().toString(),
+                         Settings::getInstance()->getUserRegistrationPassword());
+       settings.endGroup();
+       return true;
+   }
+
+
+}
+
+void TcpChatServer::setAuthorizationUser()
+{
+//    settings.beginGroup("Authorization");
+//    settings.setValue("Login", Settings::getInstance()->getUserAuthorizationLogin());
+//    settings.setValue("Password", Settings::getInstance()->getUserAuthorizationPassword());
+//    settings.endGroup();
 }

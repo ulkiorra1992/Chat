@@ -11,11 +11,8 @@
 
 #include "server.h"
 
-#define ORGANIZATION_NAME "Yuriy"
-#define ORGANIZATION_DOMAIN "www.Yuriy.ru"
-#define APPLICATION_NAME "Чат"
-
-#define SETTINGS_TRAY "settings/tray"
+#define APPLICATION_RU_NAME "Сервер"
+#define APPLICATION_EN_NAME "Server"
 
 namespace Ui {
 class TcpChatServer;
@@ -28,6 +25,9 @@ class TcpChatServer : public QMainWindow
 public:
     explicit TcpChatServer(QWidget *parent = 0);
     ~TcpChatServer();
+
+    static bool setRegistrationUser();            //!<
+    static void setAuthorizationUser();
 
 protected:
     /**
@@ -50,7 +50,7 @@ private slots:
 private:
     Ui::TcpChatServer   *ui;
     Server              *server_;
-    QSystemTrayIcon     *trayIcon_; //!< Объявляем объект иконки приложения для трея
+    QSystemTrayIcon     *trayIcon_;         //!< Объявляем объект иконки приложения для трея
 };
 
 #endif // TCPCHATSERVER_H

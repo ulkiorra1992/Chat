@@ -18,15 +18,19 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = TcpChatServer
 TEMPLATE = app
 
+DEFINES += CORE_LIBRARY
 
 SOURCES += main.cpp\
         tcpchatserver.cpp \
     tcpclientsocket.cpp \
-    server.cpp
+    server.cpp \
+    settings.cpp
 
 HEADERS  += tcpchatserver.h \
     tcpclientsocket.h \
-    server.h
+    server.h \
+    core_global.h \
+    settings.h
 
 FORMS    += tcpchatserver.ui
 
