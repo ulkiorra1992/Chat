@@ -20,7 +20,7 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = TcpChatClient
+TARGET = Client
 TEMPLATE = app
 
 
@@ -31,7 +31,8 @@ SOURCES += main.cpp\
 
 HEADERS  += tcpchatclient.h \
     userauthorization.h \
-    userregistration.h
+    userregistration.h \
+    projectnamehelper.h
 
 FORMS    += tcpchatclient.ui \
     userauthorization.ui

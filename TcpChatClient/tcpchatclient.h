@@ -3,8 +3,13 @@
 
 #include "userauthorization.h"
 
-#include <QMainWindow>
+#include <QAction>
+#include <QObject>
 #include <QTcpSocket>
+#include <QMainWindow>
+#include <QCloseEvent>
+#include <QSystemTrayIcon>
+
 
 namespace Ui {
 class TcpChatClient;
@@ -22,6 +27,8 @@ public:
 
 private:
     Ui::TcpChatClient *ui;
+    QSystemTrayIcon   *trayIcon_;   //!< Объявляем объект иконки приложения для трея
+
     QTcpSocket tcpSocket_;
     quint16 nextBlockSize_;
     qint8 type_;
@@ -40,6 +47,21 @@ private slots:
     void onError();
     void on_tbQuit_clicked();
     void on_aUserRegistration_triggered();
+    /**
+     * @brief onIconActivated обработка принятия сигнала от события нажатия
+     * на иконку приложения в трей
+     * @param reason
+     */
+    void onIconActivated(QSystemTrayIcon::ActivationReason reason);
+
+protected:
+    /**
+     * @brief closeEvent Виртуальная функция родительского класса в нашем классе
+     * переопределяется для изменения поведения приложения,
+     * чтобы оно сворачивалось в трей, когда мы этого хотим
+     * @param event событие
+     */
+    void closeEvent(QCloseEvent *event);
 };
 
 #endif // TCPCHATCLIENT_H

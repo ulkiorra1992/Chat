@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/1.jpg</file>
+        <file>img/user.png</file>
+        <file>img/chat.png</file>
+        <file>img/edit.png</file>
+        <file>img/quit.png</file>
     </qresource>
 </RCC>
