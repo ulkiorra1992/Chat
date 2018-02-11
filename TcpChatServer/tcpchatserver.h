@@ -7,6 +7,7 @@
 #include <QTcpServer>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <QNetworkSession>
 #include <QSystemTrayIcon>
 
 #include "server.h"
@@ -46,11 +47,13 @@ private slots:
      * @param reason
      */
     void onIconActivated(QSystemTrayIcon::ActivationReason reason);
+    void onSessionOpened();
 
 private:
     Ui::TcpChatServer   *ui;
     Server              *server_;
     QSystemTrayIcon     *trayIcon_;         //!< Объявляем объект иконки приложения для трея
+    QNetworkSession *networkSession_;
 };
 
 #endif // TCPCHATSERVER_H

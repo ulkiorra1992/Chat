@@ -3,5 +3,6 @@
         <file>img/user.jpg</file>
         <file>img/circle_green.png</file>
         <file>img/chat.png</file>
+        <file>img/server.png</file>
     </qresource>
 </RCC>

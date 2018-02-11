@@ -21,7 +21,9 @@ private:
      * @param date
      * @param time
      */
-    void sendData(const QDate &date, const QTime &time);
+    void sendMessage(const QDate &date, const QTime &time);
+    void sendResponse(const quint8 &type, const bool &state,
+                                 const QDate &date, const QTime &time);
     quint16 nextBlockSize;
 
 private slots:

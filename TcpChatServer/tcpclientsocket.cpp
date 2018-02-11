@@ -12,9 +12,8 @@ TcpClientSocket::TcpClientSocket(QObject *parent) :
     connect(this, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 }
 
-void TcpClientSocket::sendData(const QDate &date, const QTime &time)
+void TcpClientSocket::sendMessage(const QDate &date, const QTime &time)
 {
-
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << quint16(0) << date << time;
@@ -22,6 +21,17 @@ void TcpClientSocket::sendData(const QDate &date, const QTime &time)
     out << quint16(block.size() - sizeof(quint16));
     write(block);
 }
+
+void TcpClientSocket::sendResponse(const quint8 &type, const bool &state, const QDate &date, const QTime &time)
+{
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out << quint16(0) << type << state << date << time;
+    out.device()->seek(0);
+    out << quint16(block.size() - sizeof(quint16));
+    write(block);
+}
+
 
 void TcpClientSocket::onReadClient()
 {
@@ -44,7 +54,7 @@ void TcpClientSocket::onReadClient()
     QDate date = QDate::currentDate();
     QTime time = QTime::currentTime();
 
-    in >> requestType >> login >> userName >> password;
+    in >> requestType >> userName >> login >> password ;
 
     // Авторизация пользователя
     if (requestType == 'A') {
@@ -54,10 +64,8 @@ void TcpClientSocket::onReadClient()
         Settings::getInstance()->setUserAuthorizationPassword(password);
 
         bool state = TcpChatServer::setAuthorizationUser();
-        if (state) {
-            sendData(date, time);
-        }
-        qDebug() << "fdf";
+        sendResponse(requestType, state, date, time);
+
         QDataStream out(this);
         out << quint16(0xFFFF);
     }
@@ -72,12 +80,15 @@ void TcpClientSocket::onReadClient()
 
         // если пользователь с таким логином уже зарегистрирован, отправляем ошибку регистрации
         bool state = TcpChatServer::setRegistrationUser();
-        if (state) {
-            sendData(date, time);
-        }
+        sendResponse(requestType, state, date, time);
 
         QDataStream out(this);
         out << quint16(0xFFFF);
+    }
+
+    // Принятие и обработка сообщений
+    if (requestType == 'S') {
+
     }
 
     close();
