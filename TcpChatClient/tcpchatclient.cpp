@@ -131,7 +131,7 @@ void TcpChatClient::on_aUserAuthorization_triggered()
 
 void TcpChatClient::onConnectionToServer()
 {
-    tcpSocket_.connectToHost(QHostAddress("192.168.56.1"), 61025);
+    tcpSocket_.connectToHost(QHostAddress("192.168.0.84"), 50050);
     ui->statusBar->showMessage("Подключение к серверу...");
     nextBlockSize_ = 0;
 }
@@ -140,7 +140,7 @@ void TcpChatClient::onSendRequestToServer()
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
-    out << quint16(0) << quint8(type_) << nickName_ << login_ << password_;
+    out << quint16(0) << quint8(type_) << login_ << nickName_ << password_;
 
     out.device()->seek(0);
     out << quint16(block.size() - sizeof(quint16));
@@ -173,8 +173,9 @@ void TcpChatClient::onResponseFromServer()
         QTime timeToServer;
         quint8 type;
         bool state;
+        QStringList list;
 
-        in >> type >> state >> dateToServer >> timeToServer;
+        in >> type >> state >> dateToServer >> timeToServer >> list;
 
         if (type == 'R') {
             if (!state) {
@@ -194,6 +195,9 @@ void TcpChatClient::onResponseFromServer()
             }
         }
 
+        for (int i = 0; i < list.size(); i++) {
+            ui->teIn->append(list.at(i));
+        }
         ui->leDataToServer->setText(dateToServer.toString());
         ui->leTimeToServer->setText(timeToServer.toString());
         nextBlockSize_ = 0;

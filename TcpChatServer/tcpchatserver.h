@@ -28,7 +28,7 @@ public:
     ~TcpChatServer();
 
     static bool setRegistrationUser();            //!<
-    static bool setAuthorizationUser();
+    static QString setAuthorizationUser();
 
 protected:
     /**
@@ -48,6 +48,8 @@ private slots:
      */
     void onIconActivated(QSystemTrayIcon::ActivationReason reason);
     void onSessionOpened();
+
+    void on_aStopServer_triggered();
 
 private:
     Ui::TcpChatServer   *ui;

@@ -5,6 +5,7 @@
 
 #include <QTcpSocket>
 #include <QDateTime>
+#include <QList>
 
 
 class TcpClientSocket : public QTcpSocket
@@ -16,15 +17,18 @@ public:
     TcpClientSocket(QObject *parent = 0);
 
 private:
-    /**
-     * @brief sendData Отправка сервером данных
-     * @param date
-     * @param time
-     */
+    quint16 nextBlockSize;
+    QSet<QTcpSocket*> registrationClients_;
+    QSet<QTcpSocket*> authorizationClients_;
+    QMap<QTcpSocket*,QString> users_;
+    QMap<QString,QString> usersName_;
+
     void sendMessage(const QDate &date, const QTime &time);
     void sendResponse(const quint8 &type, const bool &state,
-                                 const QDate &date, const QTime &time);
-    quint16 nextBlockSize;
+                      const QDate &date, const QTime &time);
+    void sendResponseAuthorization(QTcpSocket *soket, const quint8 &type, const bool &state,
+                                   const QDate &date, const QTime &time,
+                                   const QStringList &list);
 
 private slots:
     /**

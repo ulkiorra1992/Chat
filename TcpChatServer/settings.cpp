@@ -21,6 +21,11 @@ void Settings::setUserAuthorizationPassword(QString password)
     authorizationPassword_ = password;
 }
 
+void Settings::setUserAuthorizationIpAdress(QString ip)
+{
+    ipAdress_ = ip;
+}
+
 void Settings::setUserRegistrationLogin(QString login)
 {
     registrationLogin_ = login;
@@ -34,4 +39,14 @@ void Settings::setUserRegistrationNickName(QString nickName)
 void Settings::setUserRegistrationPassword(QString password)
 {
     registrationPassword_ = password;
+}
+
+void Settings::setUsers(QString login, QString nickName)
+{
+    users_.insert(login, nickName);
+}
+
+void Settings::setAuthorizationUsers(QTcpSocket *soket)
+{
+    authorizationClients_.append(soket);
 }

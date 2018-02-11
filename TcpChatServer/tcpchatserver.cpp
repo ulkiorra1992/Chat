@@ -5,6 +5,7 @@
 #include "settings.h"
 
 #include <QNetworkConfigurationManager>
+#include <QHostAddress>
 #include <QTextCodec>
 #include <QDebug>
 #include <QDir>
@@ -46,30 +47,30 @@ TcpChatServer::TcpChatServer(QWidget *parent) :
     connect(trayIcon_, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
             this, SLOT(onIconActivated(QSystemTrayIcon::ActivationReason)));
 
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
-    QNetworkConfigurationManager manager;
-    if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
-        // Получаем сохранённую сетевую конфигурацию
-        QSettings settings(QSettings::UserScope, QLatin1String("Trolltech"));
-        settings.beginGroup(QLatin1String("QtNetwork"));
-        const QString id = settings.value(QLatin1String("DefaultNetworkConfiguration")).toString();
-        settings.endGroup();
+//// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ //
+//    QNetworkConfigurationManager manager;
+//    if (manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired) {
+//        // Получаем сохранённую сетевую конфигурацию
+//        QSettings settings(QSettings::UserScope, QLatin1String("Trolltech"));
+//        settings.beginGroup(QLatin1String("QtNetwork"));
+//        const QString id = settings.value(QLatin1String("DefaultNetworkConfiguration")).toString();
+//        settings.endGroup();
 
-        // Если сохранённая сетевая конфигурация в настоящее время не обнаружена, используется системная конфигурация по умолчанию
-        QNetworkConfiguration config = manager.configurationFromIdentifier(id);
-        if ((config.state() & QNetworkConfiguration::Discovered) !=
-                QNetworkConfiguration::Discovered) {
-            config = manager.defaultConfiguration();
-        }
+//        // Если сохранённая сетевая конфигурация в настоящее время не обнаружена, используется системная конфигурация по умолчанию
+//        QNetworkConfiguration config = manager.configurationFromIdentifier(id);
+//        if ((config.state() & QNetworkConfiguration::Discovered) !=
+//                QNetworkConfiguration::Discovered) {
+//            config = manager.defaultConfiguration();
+//        }
 
-        networkSession_ = new QNetworkSession(config, this);
-        connect(networkSession_, SIGNAL(opened()), this, SLOT(onSessionOpened()));
+//        networkSession_ = new QNetworkSession(config, this);
+//        connect(networkSession_, SIGNAL(opened()), this, SLOT(onSessionOpened()));
 
-        ui->statusBar->showMessage("Открытие сессии");
-        networkSession_->open();
-    } else {
-        onSessionOpened();
-    }
+//        ui->statusBar->showMessage("<font color=red>Открытие сессии</font>");
+//        networkSession_->open();
+//    } else {
+//        onSessionOpened();
+//    }
 }
 
 TcpChatServer::~TcpChatServer()
@@ -96,8 +97,11 @@ void TcpChatServer::closeEvent(QCloseEvent *event)
 
 void TcpChatServer::on_aStartServer_triggered()
 {
-    if (!server_->listen()) {
-        qDebug() << "Сервер не подключен к порту";
+    if (!server_->listen(QHostAddress::Any, 50050)) {
+        QMessageBox::critical(this, "Server",
+                              "<font color=red>Не удалось запустить сервер</font>");
+        close();
+        return;
     }
 }
 
@@ -145,8 +149,8 @@ void TcpChatServer::onSessionOpened()
     // если мы ни одного адреса не нашли, то используем IPv4 localhost
     if (ipAddress.isEmpty())
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
-    ui->statusBar->showMessage(tr("Сервер запущен, адресс:\n\nIP: %1\nпорт: %2\n\n")
-                         .arg(ipAddress).arg(server_->serverPort()));
+//    ui->statusBar->showMessage(tr("<font color=red>Сервер запущен, адресс:\n\nIP: %1\nпорт: %2\n\n</font>")
+//                         .arg(ipAddress).arg(server_->serverPort()));
 }
 
 
@@ -179,8 +183,9 @@ bool TcpChatServer::setRegistrationUser()
 
 }
 
-bool TcpChatServer::setAuthorizationUser()
+QString TcpChatServer::setAuthorizationUser()
 {
+    QString nickName;
     QSettings settings(QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/setting.ini"),
                        QSettings::IniFormat);
     if (settings.contains("RegistrationLogin/" + Settings::getInstance()->getUserAuthorizationLogin().toString())) {
@@ -189,11 +194,25 @@ bool TcpChatServer::setAuthorizationUser()
                                              Settings::getInstance()->getUserRegistrationPassword().toString()).toString();
         settings.endGroup();
         if (Settings::getInstance()->getUserAuthorizationPassword() == regPassword) {
-            return true;
+            settings.beginGroup("AuthorizationIpAddres");
+            settings.setValue(Settings::getInstance()->getUserAuthorizationLogin().toString(),
+                              Settings::getInstance()->getUserAuthorizationIpAdress());
+            settings.endGroup();
+
+            settings.beginGroup("RegistrationLogin");
+            nickName = settings.value(Settings::getInstance()->getUserAuthorizationLogin().toString(),
+                                              Settings::getInstance()->getUserRegistrationNickName()).toString();
+            return nickName;
         } else {
-            return false;
+            return nickName;
         }
     } else {
-        return false;
+        return nickName;
     }
+}
+
+void TcpChatServer::on_aStopServer_triggered()
+{
+    server_->close();
+    ui->statusBar->showMessage("<font color=red>Сервер остановлен!!!</font>");
 }
