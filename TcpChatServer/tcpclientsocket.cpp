@@ -37,7 +37,6 @@ void TcpClientSocket::sendResponseAuthorization(QTcpSocket *soket, const quint8 
                                                 const QDate &date, const QTime &time,
                                                 const QStringList &list)
 {
-//    QTcpSocket *socket = new QTcpSocket();
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
     out << quint16(0) << type << state << date << time << list;
@@ -56,6 +55,7 @@ void TcpClientSocket::onReadClient()
 
     QDataStream in(this);
 
+    for(;;) {
     if (nextBlockSize == 0) {
         if (bytesAvailable() < sizeof(quint16))
             return;
@@ -71,7 +71,7 @@ void TcpClientSocket::onReadClient()
     QTime time = QTime::currentTime();
 
     in >> requestType >> login >> userName >> password ;
-
+    nextBlockSize = 0;
     // Авторизация пользователя
     if (requestType == 'A') {
         // проверка данных пользователя при подключении его к серверу
@@ -81,18 +81,15 @@ void TcpClientSocket::onReadClient()
 
         QString nickName = TcpChatServer::setAuthorizationUser();
         Settings::getInstance()->setUsers(login, nickName);
-        Settings::getInstance()->setAuthorizationUsers(this);
+//        Settings::getInstance()->setAuthorizationUsers(this);
 
         if (nickName.isEmpty()) {
            state = false;
         } else {
            state = true;
         }
-        // Отправляем всем залогинившемся пользователям список пользователей онлайн
-        Q_FOREACH(QTcpSocket *client, Settings::getInstance()->getAuthorizationUsers()) {
-        sendResponseAuthorization(client, requestType, state, date, time,
+        sendResponseAuthorization(this, requestType, state, date, time,
                                   Settings::getInstance()->getUsers().values());
-        }
         QDataStream out(this);
         out << quint16(0xFFFF);
     }
@@ -119,5 +116,6 @@ void TcpClientSocket::onReadClient()
     }
 
     close();
+    }
 }
 

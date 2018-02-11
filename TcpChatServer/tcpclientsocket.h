@@ -10,7 +10,6 @@
 
 class TcpClientSocket : public QTcpSocket
 {
-
     Q_OBJECT
 
 public:
