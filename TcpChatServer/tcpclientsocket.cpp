@@ -12,6 +12,11 @@ TcpClientSocket::TcpClientSocket(QObject *parent) :
     connect(this, SIGNAL(disconnected()), this, SLOT(deleteLater()));
 }
 
+TcpClientSocket::~TcpClientSocket()
+{
+
+}
+
 void TcpClientSocket::sendMessage(const QDate &date, const QTime &time)
 {
     QByteArray block;
@@ -72,6 +77,7 @@ void TcpClientSocket::onReadClient()
 
     in >> requestType >> login >> userName >> password ;
     nextBlockSize = 0;
+
     // Авторизация пользователя
     if (requestType == 'A') {
         // проверка данных пользователя при подключении его к серверу
@@ -81,15 +87,20 @@ void TcpClientSocket::onReadClient()
 
         QString nickName = TcpChatServer::setAuthorizationUser();
         Settings::getInstance()->setUsers(login, nickName);
-//        Settings::getInstance()->setAuthorizationUsers(this);
+        Settings::getInstance()->setAuthorizationUsers(this, login);
+//        Settings::getInstance()->setAuthorizationClient(this);
+        users_.insert(this, login);
 
         if (nickName.isEmpty()) {
            state = false;
         } else {
            state = true;
         }
-        sendResponseAuthorization(this, requestType, state, date, time,
+
+//        Q_FOREACH(QTcpSocket *client, Settings::getInstance()->getAuthorizationClient()) {
+            sendResponseAuthorization(this, requestType, state, date, time,
                                   Settings::getInstance()->getUsers().values());
+//        }
         QDataStream out(this);
         out << quint16(0xFFFF);
     }
@@ -115,7 +126,16 @@ void TcpClientSocket::onReadClient()
 
     }
 
+    //Удаление пользователя из списка онлайн
+    if (requestType == 'Q') {
+        Settings::getInstance()->setRemoveUsers(login);
+        sendResponseAuthorization(this, requestType, state, date, time,
+                                  Settings::getInstance()->getUsers().values());
+    }
+
+    qDebug() << users_.keys();
     close();
     }
+
 }
 

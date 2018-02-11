@@ -46,7 +46,18 @@ void Settings::setUsers(QString login, QString nickName)
     users_.insert(login, nickName);
 }
 
-void Settings::setAuthorizationUsers(QTcpSocket *soket)
+void Settings::setRemoveUsers(QString login)
 {
-    authorizationClients_.append(soket);
+    users_.remove(login);
+}
+
+void Settings::setAuthorizationUsers(QTcpSocket *soket, QString login)
+{
+    authorizationUsers_.insert(soket, login);
+}
+
+void Settings::setAuthorizationClient(QTcpSocket *soket)
+{
+    authorizationClients_.insert(soket);
+    qDebug() << authorizationClients_;
 }

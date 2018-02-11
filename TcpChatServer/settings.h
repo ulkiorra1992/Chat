@@ -27,7 +27,9 @@ public:
     void setUserRegistrationPassword(QString password);
 
     void setUsers(QString login, QString nickName);
-    void setAuthorizationUsers(QTcpSocket* soket);
+    void setRemoveUsers(QString login);
+    void setAuthorizationUsers(QTcpSocket* soket, QString login);
+    void setAuthorizationClient(QTcpSocket* soket);
 
     QVariant getUserAuthorizationLogin() {return authorizationLogin_; }
     QVariant getUserAuthorizationPassword() { return authorizationPassword_; }
@@ -38,7 +40,8 @@ public:
     QVariant getUserRegistrationPassword() { return registrationPassword_; }
 
     QMap<QString, QString> getUsers() {return users_; }
-    QList<QTcpSocket*> getAuthorizationUsers() {return authorizationClients_; }
+    QMap<QTcpSocket*, QString> getAuthorizationUsers() {return authorizationUsers_; }
+    QSet<QTcpSocket*> getAuthorizationClient() {return authorizationClients_; }
 
 private:
     Settings() {
@@ -59,7 +62,8 @@ private:
     QString registrationPassword_;
 
     QMap <QString, QString> users_;
-    QList<QTcpSocket*> authorizationClients_;
+    QMap<QTcpSocket*, QString> authorizationUsers_;
+    QSet<QTcpSocket*> authorizationClients_;
 };
 
 #endif // SETTINGS_H

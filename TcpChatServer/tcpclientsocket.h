@@ -14,6 +14,7 @@ class TcpClientSocket : public QTcpSocket
 
 public:
     TcpClientSocket(QObject *parent = 0);
+    ~TcpClientSocket();
 
 private:
     quint16 nextBlockSize;

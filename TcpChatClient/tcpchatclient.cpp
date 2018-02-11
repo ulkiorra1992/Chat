@@ -113,6 +113,8 @@ void TcpChatClient::closeEvent(QCloseEvent *event)
                                "Приложение свернуто в трей. Для того чтобы, "
                                "развернуть окно приложения, щелкните по иконке приложения в трее",
                                icon, 4000);
+    } else {
+        onSendRequestToServer();
     }
 }
 
@@ -221,5 +223,7 @@ void TcpChatClient::onError()
 
 void TcpChatClient::on_tbQuit_clicked()
 {
+    type_ = 'Q';
+    onSendRequestToServer();
     qApp->exit();
 }
